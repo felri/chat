@@ -1,11 +1,15 @@
 import mongoose from 'mongoose';
 
-const { Schema } = mongoose;
-
-const schema = new Schema({
+const schema = new mongoose.Schema({
+  name: {
+    type: String,
+  }
   room: {
     type: String,
     unique: true,
+  },
+  firebaseToken: {
+    type: String,
   }
 });
 
@@ -17,7 +21,7 @@ schema.statics.findOneOrCreate = function findOneOrCreate(condition, callback) {
 }
 
 schema.pre('remove', function (next) {
-  this.model('Message').deleteMany({ room: this._id }, next);
+  this.model('Messages').deleteMany({ room: this._id }, next);
 });
 
 const Room = mongoose.model('Room', schema);

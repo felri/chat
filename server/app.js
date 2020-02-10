@@ -15,6 +15,7 @@ const createUsersWithMessages = async () => {
   const message1 = new models.Messages({
     text: 'Published the Road to learn React',
     room: room1.id,
+    user: 'phone'
   });
   await message1.save();
   await room1.save();
@@ -34,28 +35,42 @@ connectDb().then(async () => {
   });
 
   io.on('connection', function (socket) {
-    socket.on('create', room => {
-      socket.join(room);
-
+    
+    socket.on('create', function (data) {
+      socket.join(data.room);
       models.Room.findOneOrCreate({ room: room }, (err, room) => {
         models.Messages.find({ room: room._id }, (err, messages) => {
-          console.log(messages)
-          io.to(room).emit('connected', messages);
+          io.to(data.room).emit('connected', messages);
         })
       })
-
-
-    });
+    })
 
     socket.on('message', function (data) {
+      models.Room.find({ room: data.room }, async (err, room) => {
+        const message = await new models.Messages({
+          text: data.message,
+          room: room._id,
+          user: data.user
+        })
+        await message.save()
 
-      socket.emit('message', { hello: 'from server' });
+        models.Messages.find({ room: room._id }, (err, messages) => {
+          io.to(data.room).emit('message', messages);
+        })
+      })
+    })
+
+    socket.on('clean', function (data) {
+      models.Room.findOneOrCreate({ room: data.room }, (err, room) => {
+        modes.Room.remove({id: room._id}, (err, resp) => {
+          io.to(data.room).emit('romm cleaned');
+        })
+      })
     });
 
-    socket.on('disconnect', function () {
-      io.to('some room').emit('user disconnected');
-    });
-
-  });
-});
+    socket.on('disconnect', function (data) {
+      io.to(data.room).emit('user disconnected');
+    })
+  })
+})
 
