@@ -17,7 +17,49 @@ const createUsersWithMessages = async () => {
     room: room1.id,
     user: 'phone'
   });
+  const message2 = new models.Messages({
+    text: 'Published the Road to learn React',
+    room: room1.id,
+    user: 'phone'
+  });
+  const message3 = new models.Messages({
+    text: 'Published the Road to learn React',
+    room: room1.id,
+    user: 'phone'
+  });
+  const message4 = new models.Messages({
+    text: 'Published the Road to learn React',
+    room: room1.id,
+    user: 'phone'
+  });
+  const message5 = new models.Messages({
+    text: 'Published the Road to learn React',
+    room: room1.id,
+    user: 'phone'
+  });
+  const message6 = new models.Messages({
+    text: 'Published the Road to learn React',
+    room: room1.id,
+    user: 'phone'
+  });
+  const message7 = new models.Messages({
+    text: 'Published the Road to learn React',
+    room: room1.id,
+    user: 'phone'
+  });
+  const message8 = new models.Messages({
+    text: 'Published the Road to learn React',
+    room: room1.id,
+    user: 'phone'
+  });
   await message1.save();
+  await message2.save();
+  await message3.save();
+  await message4.save();
+  await message5.save();
+  await message6.save();
+  await message7.save();
+  await message8.save();
   await room1.save();
 };
 
@@ -39,8 +81,8 @@ connectDb().then(async () => {
     socket.on('create', function (data) {
       socket.join(data.room);
       models.Room.findOneOrCreate({ room: data.room }, data, (err, room) => {
-        models.Messages.find({ room: room._id }, (err, messages) => {
-          io.to(data.room).emit('connected', { messages, room });
+        models.Messages.paginate({ room: room._id }, data.options, (err, messages) => {
+          io.to(data.room).emit('connected', { messages: messages.docs, room: room });
         })
       })
     })

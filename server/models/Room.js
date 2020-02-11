@@ -25,7 +25,6 @@ schema.statics.findOneOrCreate = function findOneOrCreate(condition, data, callb
       }
       return self.create(room, (err, result) => { return callback(err, result) })
     }
-
   })
 }
 
