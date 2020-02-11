@@ -11,7 +11,7 @@ const schema = new mongoose.Schema({
     required: true
   },
   room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' },
-});
+}, { timestamps: true });
 
 const Messages = mongoose.model('Messages', schema);
 export default Messages;

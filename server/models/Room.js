@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const schema = new mongoose.Schema({
   name: {
     type: String,
-  }
+  },
   room: {
     type: String,
     unique: true,
@@ -11,12 +11,21 @@ const schema = new mongoose.Schema({
   firebaseToken: {
     type: String,
   }
-});
+}, { timestamps: true });
 
-schema.statics.findOneOrCreate = function findOneOrCreate(condition, callback) {
+schema.statics.findOneOrCreate = function findOneOrCreate(condition, data, callback) {
   const self = this
   self.findOne(condition, (err, result) => {
-    return result ? callback(err, result) : self.create(condition, (err, result) => { return callback(err, result) })
+    if (result) {
+      return callback(err, result)
+    } else {
+      const room = {
+        room: data.room,
+        name: data.name
+      }
+      return self.create(room, (err, result) => { return callback(err, result) })
+    }
+
   })
 }
 
